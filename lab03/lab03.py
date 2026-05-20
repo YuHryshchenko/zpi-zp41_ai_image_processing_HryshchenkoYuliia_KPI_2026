@@ -74,8 +74,8 @@ def process_image(img_path):
     wait_and_clear(2)
 
     # 3. Apply Gaussian Blur
-    kernel_size = 5
-    blur = cv2.GaussianBlur(grayscale, (kernel_size, kernel_size), 0)
+    blur_ksize = 9
+    blur = cv2.GaussianBlur(grayscale, (blur_ksize, blur_ksize), 0)
     cv2.imshow('3 - Blurred', blur)
     wait_and_clear(3)
 
@@ -86,8 +86,22 @@ def process_image(img_path):
     cv2.imshow('4 - Canny Edges', edges)
     wait_and_clear(4)
 
+    # 4.1 Mask out car hood and the dust at the bottom
+    h, w = edges.shape[:2]
+    # Area: from 0% width and 83% height to the bottom-right corner
+    cv2.rectangle(edges, (0, int(h * 0.83)), (w, h), 0, -1)
+    cv2.imshow('4.1 - Edges without Hood', edges)
+    wait_and_clear(4.1)
+
+    # 4.2 Dilate edges to make lines thicker
+    dilate_ksize = 20
+    kernel_dilate = np.ones((dilate_ksize, dilate_ksize), np.uint8)
+    dilated_edges = cv2.dilate(edges, kernel_dilate, iterations=1)
+    cv2.imshow('4.2 - Dilated Edges', dilated_edges)
+    wait_and_clear(4.2)
+
     # 5. Region of Interest (ROI) Mask
-    h, w = img.shape[:2]
+    # h, w already obtained from edges.shape above
     # Using a hexagon ROI to capture the full width at the bottom and sides
     # and taper toward the horizon to focus on the lanes.
     vertices = np.array([
@@ -97,7 +111,7 @@ def process_image(img_path):
             (w, int(h * 0.7)),               # mid-right (30% up from bottom)
             (int(w * 0.66), int(h * 0.42)),  # top-right
             (int(w * 0.62), int(h * 0.42)),  # top-left
-            (int(w * 0.3), int(h * 0.8))               # mid-left (90% up from bottom)
+            (int(w * 0.3), int(h * 0.8))     # mid-left (80% up from bottom)
         ]
     ], dtype=np.int32)
 
@@ -107,7 +121,7 @@ def process_image(img_path):
     cv2.imshow('5 - Masked Poly', masked_poly)
     wait_and_clear(5.1)
 
-    masked_edges = cv2.bitwise_and(edges, mask)
+    masked_edges = cv2.bitwise_and(dilated_edges, mask) # Apply mask to dilated edges
     cv2.imshow('5 - Masked Edges', masked_edges)
     wait_and_clear(5.2)
 
@@ -136,25 +150,34 @@ def process_video(video_path):
         ret, frame = video_capture.read()
         if ret:
             # Inline processing for the video frame
+            blur_ksize = 9
             grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            blur = cv2.GaussianBlur(grayscale, (5, 5), 0)
+            blur = cv2.GaussianBlur(grayscale, (blur_ksize, blur_ksize), 0)
             edges = cv2.Canny(blur, 50, 150)
+            
+            h, w = edges.shape[:2]
+            # Mask out car hood to prevent it from interfering with Hough Transform
+            cv2.rectangle(edges, (0, int(h * 0.83)), (w, h), 0, -1)
 
-            h, w = frame.shape[:2]
+            # Dilate edges to make lines thicker for better Hough Transform detection
+            dilate_ksize = 20
+            kernel_dilate = np.ones((dilate_ksize, dilate_ksize), np.uint8)
+            dilated_edges = cv2.dilate(edges, kernel_dilate, iterations=1)
+
             vertices = np.array([
                 [
-                    (0, h),                         # bottom-left
-                    (w, h),                         # bottom-right
-                    (w, int(h * 0.7)),              # mid-right
-                    (int(w * 0.6), int(h * 0.45)),  # top-right
-                    (int(w * 0.4), int(h * 0.45)),  # top-left
-                    (0, int(h * 0.7))               # mid-left
+                    (int(w * 0.3), h),               # bottom-left
+                    (w, h),                          # bottom-right
+                    (w, int(h * 0.7)),               # mid-right (30% up from bottom)
+                    (int(w * 0.66), int(h * 0.42)),  # top-right
+                    (int(w * 0.62), int(h * 0.42)),  # top-left
+                    (int(w * 0.3), int(h * 0.8))     # mid-left (80% up from bottom)
                 ]
             ], dtype=np.int32)
 
             mask = np.zeros_like(edges)
-            cv2.fillPoly(mask, vertices, 255)
-            masked_edges = cv2.bitwise_and(edges, mask)
+            cv2.fillPoly(mask, vertices, 255) # Fill the mask with white
+            masked_edges = cv2.bitwise_and(dilated_edges, mask) # Apply mask to dilated edges
             
             lines = cv2.HoughLinesP(masked_edges, 3, np.pi / 180, 15, np.array([]), 
                                     minLineLength=150, maxLineGap=60)

@@ -70,7 +70,7 @@ Stable Diffusion — модель прихованої дифузії для п�
 
 3. Встановіть необхідні бібліотеки:
    ```bash
-   pip install opencv-python imutils numpy tensorflow dlib diffusers transformers
+   pip install opencv-python imutils numpy face_recognition tensorflow dlib diffusers transformers
    ```
    or
    ```bash
