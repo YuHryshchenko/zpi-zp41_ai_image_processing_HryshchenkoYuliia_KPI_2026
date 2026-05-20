@@ -6,3 +6,6 @@ pip install -r requirements.txt
 
 python3 lab01/lab01.py
 python3 lab02/lab02.py
+python3 lab03/lab03.py
+python3 lab04/lab04.py
+python3 lab05/lab05.py
