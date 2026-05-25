@@ -14,6 +14,7 @@ LAB_PATH = os.path.join(ABSOLUTE_PATH, "lab06")
 os.makedirs(LAB_PATH, exist_ok=True)
 
 # Константи
+NUM_EPOCHS = 2
 TOTAL_IMG_NUM = 500
 VALIDATION_IMG_NUM = 100
 TRAINING_IMG_NUM = 300
@@ -115,7 +116,7 @@ if not model_loaded_successfully:
     tensorboard_cb = keras.callbacks.TensorBoard(run_logdir)
 
     # Навчання
-    history = model.fit(train_ds, epochs=2, validation_data=validation_ds, callbacks=[tensorboard_cb])
+    history = model.fit(train_ds, epochs=NUM_EPOCHS, validation_data=validation_ds, callbacks=[tensorboard_cb])
 
     # Збереження моделі після тренування
     print(f"\n[ІНФО] Збереження навченої моделі у '{MODEL_PATH}'...")
