@@ -7,7 +7,7 @@ import cv2
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Вказуємо шлях до зображень
-ABSOLUTE_PATH = os.getcwd()
+ABSOLUTE_PATH = os.getcwd() # Отримати поточну робочу директорію (папку), в якій зараз виконується Python-скрипт
 LAB_PATH = ABSOLUTE_PATH + "/lab04/"
 
 DATASET_DIR = LAB_PATH + "/dataset"
@@ -25,21 +25,21 @@ except ImportError as e:
     sys.exit(1)
 
 def main():
-    print("=" * 70)
+    print("=" * 70) # Малює ======================================================================
     print("  Головний керуючий сценарій для лабораторної роботи №4")
     print("  Тема: Розпізнавання людини на фото з використанням бібліотеки Dlib")
     print("=" * 70)
 
     # --- ЕТАП 1: Валідація структури папок перед початком ---
     print("\n[КРОК 1/3] Перевірка наявності вхідних даних...")
-    if not os.path.exists(DATASET_DIR):
+    if not os.path.exists(DATASET_DIR): # Перевірка dataset -> Чи існує папка з фото для навчання
         print(f"[УВАГА] Папку еталонів '{DATASET_DIR}' не знайдено.")
         print(f"Створюємо порожню папку '{DATASET_DIR}'. Будь ласка, додайте туди підпапки з фото відомих людей.")
-        os.makedirs(DATASET_DIR)
+        os.makedirs(DATASET_DIR) # Якщо папки нема -> Створюємо її автоматично
         sys.exit(0)
     else:
         # Перевіряємо, чи є всередині папки з обличчями
-        subdirs = [d for d in os.listdir(DATASET_DIR) if os.path.isdir(os.path.join(DATASET_DIR, d))]
+        subdirs = [d for d in os.listdir(DATASET_DIR) if os.path.isdir(os.path.join(DATASET_DIR, d))] # Якщо папка є -> перевіряємо підпапки
         if not subdirs:
             print(f"[Попередження] Папка '{DATASET_DIR}' порожня! Створіть у ній підпапки (наприклад, '{DATASET_DIR}/Ivan/')")
             print("і покладіть туди фотографії облич для навчання.")

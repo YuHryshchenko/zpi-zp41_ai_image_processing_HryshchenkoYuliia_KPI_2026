@@ -13,7 +13,7 @@ print("OpenCV Version:", cv2.__version__)
 wait_and_clear(1)
 
 # Вказуємо шлях до зображень
-absolute_path = os.getcwd()
+absolute_path = os.getcwd() # Отримати поточну робочу директорію (папку), в якій зараз виконується Python-скрипт
 image_path = absolute_path + '/lab02/petapixel6.jpg'
 video1_path = absolute_path + '/lab02/39837-424360872_medium.mp4'
 video2_path = absolute_path + '/lab02/2121-155244120_medium.mp4'
@@ -29,45 +29,47 @@ def process_photo(image_path):
         print(f"Файл {image_path} не знайдено.")
         return
     
-    img = cv2.imread(image_path)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.imread(image_path) # Читання файлу
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # Перетворення зображення в відтінки сірого
+    # cv2.imwrite(absolute_path + '/lab02/saved_foto_02.jpg', gray)
     
     # 1. Виявлення облич
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    print(f"Знайдено осіб на фото: {len(faces)}")
+    # img = cv2.imread(absolute_path + '/lab02/saved_foto_02.jpg')
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5) # 1.3 -> точний масштабний пошук, 5 -> середня строгість
+    print(f"Знайдено осіб на фото: {len(faces)}") # Знайдено осіб на фото: 14
     
-    for (x, y, w, h) in faces:
+    for (x, y, w, h) in faces: # faces — це список облич, x, y → верхній лівий кут обличчя, w, h → ширина і висота
         # 1. Виявлення облич (синій колір)
         cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
         roi_gray = gray[y:y+h, x:x+w]
         roi_color = img[y:y+h, x:x+w]
         
         # 2. Виявлення очей в межах обличчя (жовтий колір)
-        eyes = eye_cascade.detectMultiScale(roi_gray)
+        eyes = eye_cascade.detectMultiScale(roi_gray) # Шукаємо очі лише всередині обличчя
         for (ex, ey, ew, eh) in eyes:
             cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 255), 2)
             
         # 3. Виявлення посмішки (червоний колір)
-        smiles = smile_cascade.detectMultiScale(roi_gray, 1.8, 20)
+        smiles = smile_cascade.detectMultiScale(roi_gray, 1.8, 20) # 1.8 -> великий крок масштабування (швидше, але грубіше), 20 -> дуже строгий фільтр (менше хибних спрацьовувань)
         for (sx, sy, sw, sh) in smiles:
             cv2.rectangle(roi_color, (sx, sy), (sx+sw, sy+sh), (0, 0, 255), 2)
 
-    cv2.imshow('Detection Results', img)
+    cv2.imshow('Detection Results', img) # Відобразити зображення
     wait_and_clear(2)
 
 def process_video(source=0):
     """source=0 - веб-камера, або шлях до відеофайлу"""
-    cap = cv2.VideoCapture(source)
+    cap = cv2.VideoCapture(source) # Відкриття відеопотоку
     print("Натисніть 'q' для виходу з відео.")
     
     while True:
-        ret, frame = cap.read()
-        if not ret: break
+        ret, frame = cap.read() # cap.read() -> береться один кадр з камери; ret -> отриман чи не отриман кадр; frame -> сам кадр
+        if not ret: break # Якщо кадру немає -> завершити
         
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # Перетворення зображення на відео у відтінки сірого
         
         # Детекція облич
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4) # 1.1 -> точний масштабний пошук, 4 -> середня строгість
         for (x, y, w, h) in faces:
             # 1. Виявлення облич (синій колір)
             roi_gray = gray[y:y+h, x:x+w]
@@ -80,20 +82,20 @@ def process_video(source=0):
                 cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 255), 2)
                 
             # 3. Виявлення посмішки (червоний колір)
-            smiles = smile_cascade.detectMultiScale(roi_gray, 1.8, 20)
+            smiles = smile_cascade.detectMultiScale(roi_gray, 1.8, 20) # 1.8 -> великий крок масштабування (швидше, але грубіше), 20 -> дуже строгий фільтр (менше хибних спрацьовувань)
             for (sx, sy, sw, sh) in smiles:
                 cv2.rectangle(roi_color, (sx, sy), (sx+sw, sy+sh), (0, 0, 255), 2)
             
         # Детекція пішоходів (HOG або каскади, тут каскади для прикладу)
-        bodies = body_cascade.detectMultiScale(gray, 1.1, 3)
+        bodies = body_cascade.detectMultiScale(gray, 1.1, 3) # 1.1 -> точний масштабний пошук, 3 -> середня строгість
         for (x, y, w, h) in bodies:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 165, 255), 4)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 165, 255), 4) # (0,165,255) → помаранчевий колір
             
-        cv2.imshow('Video Detection', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        cv2.imshow('Video Detection', frame) # Відобразити відео
+        if cv2.waitKey(1) & 0xFF == ord('q'): # waitKey(1) -> Щосекунди OpenCV слухає клавіатуру
             break
             
-    cap.release()
+    cap.release() # Це звільняє камеру
     cv2.destroyAllWindows()
 
 # Виконання

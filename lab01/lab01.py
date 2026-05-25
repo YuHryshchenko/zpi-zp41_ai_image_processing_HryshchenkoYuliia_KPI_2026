@@ -16,7 +16,7 @@ print("OpenCV Version:", cv2.__version__)
 wait_and_clear(1)
 
 # Вказуємо шлях до зображення
-absolute_path = os.getcwd()
+absolute_path = os.getcwd() # Отримати поточну робочу директорію (папку), в якій зараз виконується Python-скрипт
 image_path = absolute_path + '/lab01/cat.jpg'
 image2_path = absolute_path + '/lab01/game_of_thrones.jpg'
 
@@ -53,7 +53,7 @@ if img.shape[0] > 100 and img.shape[1] > 50:
     print(f"Піксель на (50, 100) -> Червоний (R): {red}, Зелений (G): {green}, Синій (B): {blue}") # Піксель на (50, 100) -> Червоний (R): 151, Зелений (G): 151, Синій (B): 151
 wait_and_clear(5)
 
-# --- 6. Вирізання (Crop) регіону інтересу (ROI) ---
+# --- 6. Вирізання (Crop) регіону інтересу (Region of Interest (ROI)) ---
 img = cv2.imread(image2_path) # Читання файлу
 if img.shape[0] > 160 and img.shape[1] > 420:
     roi = img[60:160, 320:420] # верхня межа: y (рядки) = 60; нижня межа: y (рядки) = 159; ліва межа: x (стовпці) = 320; права межа: x (стовпці) = 419
@@ -148,8 +148,9 @@ wait_and_clear(17)
 
 # --- 18. Розміщення тексту на зображенні ---
 img_black4 = np.zeros((200, 550, 3), np.uint8)
-font = cv2.FONT_HERSHEY_SCRIPT_COMPLEX
+font = cv2.FONT_HERSHEY_SCRIPT_COMPLEX # Вибір стилю шрифту
 cv2.putText(img_black4, 'OpenCV', (0, 100), font, 4, (255, 255, 255), 4, cv2.LINE_4)
+# (0, 100) -> Це нижній лівий кут тексту: x = 0, y = 100; 4 -> Це розмір текст; білий колір; 4 -> Товщина літер; cv2.LINE_4 -> просте з’єднання пікселів
 cv2.imshow("Text", img_black4) # Відобразити зображення
 wait_and_clear(18, "закінчити")
 
