@@ -3,8 +3,9 @@ import os
 
 def wait_and_clear(task_num : float, next_task : str = "продовжити"):
     print(f"\n--- Натисніть ENTER (в консолі або на вікні зображення) щоб закрити завдання {task_num} і {next_task}) ---")
-    cv2.waitKey(1)
-    input()
+    key = cv2.waitKey(0) & 0xFF
+    if key == 13:
+      print(f"\n--- {next_task} ---")
     cv2.destroyAllWindows()
 
 # 1. --- Перевірка версії OpenCV ---

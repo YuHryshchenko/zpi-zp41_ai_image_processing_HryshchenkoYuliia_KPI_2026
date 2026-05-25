@@ -9,8 +9,9 @@ video_path = absolute_path + '/lab03/854669-hd_1920_1080_30fps.mp4'
 
 def wait_and_clear(task_num : float, next_task : str = "продовжити"):
     print(f"\n--- Натисніть ENTER (в консолі або на вікні зображення) щоб закрити завдання {task_num} і {next_task}) ---")
-    cv2.waitKey(1)
-    input()
+    key = cv2.waitKey(0) & 0xFF
+    if key == 13:
+      print(f"\n--- {next_task} ---")
     cv2.destroyAllWindows()
 
 def draw_lines(img, lines, color=[255, 0, 0], thickness=7):

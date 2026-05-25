@@ -1,11 +1,17 @@
-python3 -m venv .venv
-source .venv/bin/activate
+# python3 -m venv .venv
+# source .venv/bin/activate
+# pip install --upgrade pip
+# pip install -r requirements.txt
 
-pip install --upgrade pip
-pip install -r requirements.txt
+cd ~/Projects/zpi-zp41_ai_image_processing_HryshchenkoYuliia_KPI_2026/
+
+source .venv/bin/activate
 
 python3 lab01/lab01.py
 python3 lab02/lab02.py
 python3 lab03/lab03.py
 python3 lab04/lab04.py
 python3 lab05/lab05.py
+python3 lab06/lab06.py
+python3 lab07/lab07.py
+python3 lab08/lab08.py
